@@ -317,29 +317,33 @@
 
 <section id="download">
   <h2>Download</h2>
-  <p class="sub">build from source — requires Go 1.21+, takes seconds</p>
+  <p class="sub">one script, zero dependencies — works on a brand-new PC</p>
   <div class="dl">
     <div class="dlc glass">
       <div class="ico"><i class="fa-brands fa-windows"></i></div>
       <h3>Windows</h3>
-      <p>64-bit, build with Go</p>
-      <code>git clone https://github.com/T4fs/Anikoto-in-Terminal<br>cd Anikoto-in-Terminal/anikoto<br>go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui</code>
-      <p style="color:var(--muted);font-size:.85rem;margin-top:8px;">Optional — make <code>anikoto</code> available everywhere:</p>
-      <code>New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims"<br>Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'</code>
+      <p>copy-paste into PowerShell</p>
+      <code>irm https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.ps1 | iex</code>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:8px;">Installs Go, builds <code>anitui.exe</code>, and adds an <code>anikoto</code> command to your PATH — no Go, git, or admin needed. Open a new terminal, then:</p>
+      <code>anikoto</code>
       <a class="btn" href="https://github.com/T4fs/Anikoto-in-Terminal">Source on GitHub</a>
     </div>
     <div class="dlc glass">
       <div class="ico"><i class="fa-brands fa-linux"></i></div>
       <h3>Linux</h3>
-      <p>build with make</p>
-      <code>git clone https://github.com/T4fs/Anikoto-in-Terminal<br>cd Anikoto-in-Terminal/anikoto<br>make build<br>./build/anitui</code>
+      <p>copy-paste into a terminal</p>
+      <code>curl -fsSL https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.sh | bash</code>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:8px;">Installs Go, builds <code>anitui</code>, and adds it to your PATH — no Go, git, make, or admin needed. Then:</p>
+      <code>anikoto</code>
       <a class="btn" href="https://github.com/T4fs/Anikoto-in-Terminal">Source on GitHub</a>
     </div>
     <div class="dlc glass">
       <div class="ico"><i class="fa-brands fa-apple"></i></div>
       <h3>macOS</h3>
-      <p>Intel &amp; Apple Silicon</p>
-      <code>git clone https://github.com/T4fs/Anikoto-in-Terminal<br>cd Anikoto-in-Terminal/anikoto<br>make build<br>./build/anitui</code>
+      <p>copy-paste into a terminal</p>
+      <code>curl -fsSL https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.sh | bash</code>
+      <p style="color:var(--muted);font-size:.85rem;margin-top:8px;">Installs Go, builds <code>anitui</code> (Intel &amp; Apple Silicon), and adds it to your PATH — no Go, git, make, or admin needed. Then:</p>
+      <code>anikoto</code>
       <a class="btn" href="https://github.com/T4fs/Anikoto-in-Terminal">Source on GitHub</a>
     </div>
   </div>

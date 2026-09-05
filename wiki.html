@@ -134,6 +134,16 @@
 
   <div class="entry glass">
     <span class="date">2026-08-14</span>
+    <h3>One-command installer</h3>
+    <ul>
+      <li>Added self-contained installers that work on a <strong>brand-new PC</strong> (no Go, git, make, or admin needed): <code>install.ps1</code> for Windows and <code>install.sh</code> for Linux/macOS.</li>
+      <li>Each script downloads a standalone Go toolchain, fetches the source as a zip/tarball (no git), builds <code>anitui</code>, and adds an <code>anikoto</code> command to PATH.</li>
+      <li>Landing page download cards and the wiki Build &amp; Install section now lead with copy-paste one-liners.</li>
+    </ul>
+  </div>
+
+  <div class="entry glass">
+    <span class="date">2026-08-14</span>
     <h3>SEO: long-tail content</h3>
     <ul>
       <li>Landing page FAQ now answers <strong>anikoto in terminal download</strong>, <strong>source code</strong>, <strong>watch episodes</strong>, and <strong>community/reddit</strong> queries.</li>
@@ -321,19 +331,32 @@
   </div>
 
   <h2 class="sec" id="build"><i class="fa-solid fa-hammer"></i> Build &amp; Install</h2>
-  <p class="secsub">From source — requires Go 1.21+.</p>
+  <p class="secsub">Zero-dependency installer — works on a brand-new PC (installs Go for you).</p>
 
   <div class="doc">
-    <h3>Windows</h3>
-    <pre>git clone https://github.com/T4fs/Anikoto-in-Terminal
-cd Anikoto-in-Terminal/anikoto
-go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui</pre>
-    <p>Optional: make <code>anikoto</code> available in any terminal (cmd, PowerShell, Git Bash):</p>
-    <pre>New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims" | Out-Null
-Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'</pre>
+    <h3>Windows (PowerShell)</h3>
+    <pre>irm https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.ps1 | iex</pre>
+    <p>Installs Go (if missing), downloads the source, builds <code>anitui.exe</code> into
+    <code>%USERPROFILE%\.anitui\</code>, and adds an <code>anikoto</code> command to your PATH.
+    <strong>Open a new terminal</strong> and run <code>anikoto</code>. No Go, git, or admin needed.</p>
 
-    <h3>Linux / macOS</h3>
-    <pre>git clone https://github.com/T4fs/Anikoto-in-Terminal
+    <h3>Linux / macOS (bash)</h3>
+    <pre>curl -fsSL https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.sh | bash</pre>
+    <p>Installs Go (if missing), downloads the source, builds <code>anitui</code> into <code>~/.anitui/bin/</code>,
+    and adds it to your PATH. Then run <code>anikoto</code>. No Go, git, make, or admin needed.</p>
+    <p>Need <code>wget</code> instead of <code>curl</code>? The scripts auto-detect either one.</p>
+
+    <h3>Manual build (optional)</h3>
+    <p>Prefer to build yourself? Requires Go 1.25+.</p>
+    <pre># Windows (PowerShell)
+git clone https://github.com/T4fs/Anikoto-in-Terminal
+cd Anikoto-in-Terminal/anikoto
+go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui
+New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims" | Out-Null
+Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
+
+# Linux / macOS
+git clone https://github.com/T4fs/Anikoto-in-Terminal
 cd Anikoto-in-Terminal/anikoto
 make build
 ./build/anitui</pre>
