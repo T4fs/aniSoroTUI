@@ -1,8 +1,8 @@
-# anikotoTUI
+# aniSoroTUI
 
 **watch anime in your terminal**
 
-**website:** [anikotoTUI](https://t4fs.github.io/anikotoTUI/)
+**website:** [aniSoroTUI](https://t4fs.github.io/aniSoroTUI/)
 
 
 
@@ -17,7 +17,7 @@
 
 ## wiki
 
-full documentation, the update log, and bug fixes live in the [**anikotoTUI wiki**](https://t4fs.github.io/anikotoTUI/wiki.html) � every update is documented there.
+full documentation, the update log, and bug fixes live in the [**aniSoroTUI wiki**](https://t4fs.github.io/aniSoroTUI/wiki.html) � every update is documented there.
 
 ## getting started
 

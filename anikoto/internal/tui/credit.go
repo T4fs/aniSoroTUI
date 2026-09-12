@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-const creditURL = "https://github.com/T4fs/anikotoTUI"
+const creditURL = "https://github.com/T4fs/aniSoroTUI"
 
 var creditText = "made by t4fs"
 
