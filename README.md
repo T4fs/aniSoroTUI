@@ -45,12 +45,12 @@ cd anikoto
 go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui
 ```
 
-then run `%USERPROFILE%\.anitui\anitui.exe` — or add an `anikoto` command to
+then run `%USERPROFILE%\.anitui\anitui.exe` — or add an `aniSoro` command to
 any terminal (cmd, powershell, git bash) with a tiny shim on your `PATH`:
 
 ```powershell
 New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims" | Out-Null
-Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
+Set-Content "$HOME\scoop\shims\aniSoro.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
 ```
 
 ## controls
@@ -96,7 +96,7 @@ Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe"
 
 ## player support
 
-anikoto auto-detects and uses:
+aniSoro auto-detects and uses:
 
 1. mpv
 2. iina (macOS)

@@ -94,8 +94,8 @@ cd "$PROJ/anikoto"
 BIN_DIR="$ANITUI_HOME/bin"
 mkdir -p "$BIN_DIR"
 say "Building aniSoroTUI (this can take a minute)..."
-CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "$BIN_DIR/anitui" ./cmd/anitui
-say "Built $BIN_DIR/anitui"
+CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "$BIN_DIR/aniSoro" ./cmd/anitui
+say "Built $BIN_DIR/aniSoro"
 
 # ---------------------------------------------------------------------------
 # 5. add to PATH
@@ -118,4 +118,4 @@ printf '%s\n' " aniSoroTUI installed successfully."
 printf '%s\n' "──────────────────────────────────────────────────"
 printf '%b\n' "${RST}"
 printf '   Run it now, or open a new terminal and run:\n\n'
-printf '     %b%s%b\n\n' "${BOLD}${CYAN}" "anikoto" "${RST}"
+printf '     %b%s%b\n\n' "${BOLD}${CYAN}" "aniSoro" "${RST}"

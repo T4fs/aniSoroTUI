@@ -1,7 +1,7 @@
 # aniSoroTUI self-contained installer for a brand-new Windows machine.
 # - No Go, no git, no software required (built-in curl.exe + tar/Expand-Archive only).
 # - Downloads a standalone Go toolchain, fetches the source as a zip,
-#   builds anitui.exe, installs it, and creates an `anikoto` command on PATH.
+#   builds anitui.exe, installs it, and creates an `aniSoro` command on PATH.
 #
 # Usage (copy-paste into PowerShell):
 #   irm https://raw.githubusercontent.com/T4fs/aniSoroTUI/main/scripts/install.ps1 | iex
@@ -86,21 +86,21 @@ try {
   Pop-Location
 }
 
-# --- 4. install binary + create anikoto command on PATH ---
+# --- 4. install binary + create aniSoro command on PATH ---
 $exePath = Join-Path $AnituiHome 'anitui.exe'
 Copy-Item (Join-Path $binDir 'anitui.exe') $exePath -Force
 
 $shimDir = Join-Path $HOME 'scoop\shims'
 New-Item -ItemType Directory -Force -Path $shimDir | Out-Null
-$shim = Join-Path $shimDir 'anikoto.cmd'
+$shim = Join-Path $shimDir 'aniSoro.cmd'
 Set-Content -Path $shim -Value "@`"$exePath`" %*" -Encoding Ascii
 
 $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
 if ($userPath -notlike "*$shimDir*") {
   [Environment]::SetEnvironmentVariable('Path', "$userPath;$shimDir", 'User')
-  Warn "added $shimDir to your user PATH - open a NEW terminal to use 'anikoto'"
+  Warn "added $shimDir to your user PATH - open a NEW terminal to use 'aniSoro'"
 }
 
 Write-Host ""
 Write-Host "aniSoroTUI installed successfully." -ForegroundColor Green
-Write-Host "Run 'anikoto' in a new terminal." -ForegroundColor Cyan
+Write-Host "Run 'aniSoro' in a new terminal." -ForegroundColor Cyan

@@ -135,6 +135,16 @@
   <p class="secsub">Newest first. Every release gets an entry here.</p>
 
   <div class="entry glass">
+    <span class="serial">Serial #13</span>
+    <span class="date">2026-09-12</span>
+    <h3>The command is now <strong>aniSoro</strong></h3>
+    <ul>
+      <li>The installer's launch command is renamed from <code>anikoto</code>/<code>anitui</code> to <strong><code>aniSoro</code></strong> on every platform (Windows shim <code>aniSoro.cmd</code>, Unix binary <code>aniSoro</code>).</li>
+      <li>All install docs and the landing page now say <strong>run <code>aniSoro</code></strong>; existing installs can re-use the one-command installer or add the new shim manually.</li>
+    </ul>
+  </div>
+
+  <div class="entry glass">
     <span class="serial">Serial #12</span>
     <span class="date">2026-09-12</span>
     <h3>Renamed: the repo and the web are now <strong>aniSoroTUI</strong></h3>
@@ -184,7 +194,7 @@
     <h3>One-command installer</h3>
     <ul>
       <li>Added self-contained installers that work on a <strong>brand-new PC</strong> (no Go, git, make, or admin needed): <code>install.ps1</code> for Windows and <code>install.sh</code> for Linux/macOS.</li>
-      <li>Each script downloads a standalone Go toolchain, fetches the source as a zip/tarball (no git), builds <code>anitui</code>, and adds an <code>anikoto</code> command to PATH.</li>
+      <li>Each script downloads a standalone Go toolchain, fetches the source as a zip/tarball (no git), builds <code>anitui</code>, and adds an <code>aniSoro</code> command to PATH.</li>
       <li>Landing page download cards and the wiki Build &amp; Install section now lead with copy-paste one-liners.</li>
     </ul>
   </div>
@@ -259,7 +269,7 @@
       <li>Fixed home layout on wide and short windows (content capped at 100 columns, padding capped at 6 rows).</li>
       <li>Fixed logo box width (proper <code>lipgloss.Width</code> handling) and footer gap alignment.</li>
       <li>Added the clickable <strong>made by t4fs</strong> button (blue, hover highlight, opens GitHub on click).</li>
-      <li>Launchable as <code>anikoto</code> from cmd, PowerShell, and Git Bash via PATH shims.</li>
+      <li>Launchable as <code>aniSoro</code> from cmd, PowerShell, and Git Bash via PATH shims.</li>
       <li>Mouse support enabled (<code>tea.WithMouseCellMotion</code>).</li>
       <li>GitHub Pages landing site + SEO, and this wiki.</li>
     </ul>
@@ -370,7 +380,7 @@
     <h3><span class="st help">TROUBLESHOOT</span> player doesn't open when pressing enter</h3>
     <ul>
       <li>Install <strong>mpv</strong> (recommended), vlc, iina, or haruna.</li>
-      <li>Force a specific player: <code>ANITUI_PLAYER=mpv anikoto</code> (or set it in your shell profile).</li>
+      <li>Force a specific player: <code>ANITUI_PLAYER=mpv aniSoro</code> (or set it in your shell profile).</li>
       <li>Make sure the player is on your <code>PATH</code>.</li>
     </ul>
   </div>
@@ -378,7 +388,7 @@
   <div class="fix glass">
     <h3><span class="st help">TROUBLESHOOT</span> how to report a bug properly</h3>
     <ul>
-      <li>Run with debug logging: <code>ANIKOTO_DEBUG=1 anikoto</code>.</li>
+      <li>Run with debug logging: <code>ANIKOTO_DEBUG=1 aniSoro</code>.</li>
       <li>Reproduce the problem, exit, then attach <code>%TEMP%\anikoto-tui-debug.log</code> (Windows) or <code>/tmp/anikoto-tui-debug.log</code> (Linux/macOS) to a <a href="https://github.com/T4fs/aniSoroTUI/issues">GitHub issue</a>.</li>
       <li>Include your terminal (Windows Terminal / cmd / PowerShell / kitty / …) and player version.</li>
     </ul>
@@ -391,13 +401,13 @@
     <h3>Windows (PowerShell)</h3>
     <pre>irm https://raw.githubusercontent.com/T4fs/aniSoroTUI/main/scripts/install.ps1 | iex</pre>
     <p>Installs Go (if missing), downloads the source, builds <code>anitui.exe</code> into
-    <code>%USERPROFILE%\.anitui\</code>, and adds an <code>anikoto</code> command to your PATH.
-    <strong>Open a new terminal</strong> and run <code>anikoto</code>. No Go, git, or admin needed.</p>
+    <code>%USERPROFILE%\.anitui\</code>, and adds an <code>aniSoro</code> command to your PATH.
+    <strong>Open a new terminal</strong> and run <code>aniSoro</code>. No Go, git, or admin needed.</p>
 
     <h3>Linux / macOS (bash)</h3>
     <pre>curl -fsSL https://raw.githubusercontent.com/T4fs/aniSoroTUI/main/scripts/install.sh | bash</pre>
     <p>Installs Go (if missing), downloads the source, builds <code>anitui</code> into <code>~/.anitui/bin/</code>,
-    and adds it to your PATH. Then run <code>anikoto</code>. No Go, git, make, or admin needed.</p>
+    and adds it to your PATH. Then run <code>aniSoro</code>. No Go, git, make, or admin needed.</p>
     <p>Need <code>wget</code> instead of <code>curl</code>? The scripts auto-detect either one.</p>
 
     <h3>Manual build (optional)</h3>
@@ -407,7 +417,7 @@ git clone https://github.com/T4fs/aniSoroTUI
 cd aniSoroTUI/anikoto
 go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui
 New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims" | Out-Null
-Set-Content "$HOME\scoop\shims\anikoto.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
+Set-Content "$HOME\scoop\shims\aniSoro.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
 
 # Linux / macOS
 git clone https://github.com/T4fs/aniSoroTUI
