@@ -25,69 +25,69 @@ var logoLetters = []logoLetter{
 	},
 	{
 		art: []string{
-			" ███╗  ",
-			"██╔══╝ ",
-			"██║    ",
-			"██║    ",
-			"██║    ",
-			"╚═╝    ",
+			"███╗   ██╗",
+			"████╗  ██║",
+			"██╔██╗ ██║",
+			"██║╚██╗██║",
+			"██║ ╚████║",
+			"╚═╝  ╚═══╝",
 		},
 		color: lipgloss.Color("15"),
 	},
 	{
 		art: []string{
-			" ██╗   ",
-			"██╔╝   ",
-			"██║    ",
-			"██║    ",
-			"██║    ",
-			"╚═╝    ",
+			"██╗",
+			"██║",
+			"██║",
+			"██║",
+			"██║",
+			"╚═╝",
 		},
-		color: lipgloss.Color("12"),
+		color: lipgloss.Color("15"),
 	},
 	{
 		art: []string{
-			"██╗  ██╗",
-			"██║ ██╔╝",
-			"█████╔╝ ",
+			"███████╗",
+			"██╔════╝",
+			"███████╗",
+			"╚════██║",
+			"███████║",
+			"╚══════╝",
+		},
+		color: lipgloss.Color("11"),
+	},
+	{
+		art: []string{
+			" ██████╗",
+			"██╔═══██╗",
+			"██║   ██║",
+			"██║   ██║",
+			"╚██████╔╝",
+			" ╚═════╝",
+		},
+		color: lipgloss.Color("11"),
+	},
+	{
+		art: []string{
+			"██████╗",
+			"██╔══██╗",
+			"██████╔╝",
 			"██╔══██╗",
 			"██║  ██║",
 			"╚═╝  ╚═╝",
 		},
-		color: lipgloss.Color("15"),
+		color: lipgloss.Color("11"),
 	},
 	{
 		art: []string{
-			" █████╗",
-			"██╔══██╗",
-			"██║  ██║",
-			"██║  ██║",
-			"██║  ██║",
-			"╚█████╔╝",
+			" ██████╗",
+			"██╔═══██╗",
+			"██║   ██║",
+			"██║   ██║",
+			"╚██████╔╝",
+			" ╚═════╝",
 		},
-		color: lipgloss.Color("15"),
-	},
-	{
-		art: []string{
-			"████████╗",
-			"╚══██╔══╝",
-			"   ██║   ",
-			"   ██║   ",
-			"   ██║   ",
-			"   ╚═╝   ",
-		},
-		color: lipgloss.Color("15"),
-	},
-	{
-		art: []string{
-			" █████╗",
-			"██╔══██╗",
-			"██║  ██║",
-			"██║  ██║",
-			"██║  ██║",
-			"╚█████╔╝",
-		},
-		color: lipgloss.Color("12"),
+		color: lipgloss.Color("11"),
 	},
 }
 
@@ -149,9 +149,7 @@ func centerIn(s string, width int) string {
 
 func BrandName() string {
 	var b strings.Builder
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("15")).Render("An"))
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("12")).Render("!"))
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("15")).Render("KOT"))
-	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("12")).Render("O"))
+	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("15")).Render("Ani"))
+	b.WriteString(lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("11")).Render("soro"))
 	return b.String()
 }

@@ -36,7 +36,7 @@ func main() {
 	p := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
 
 	if _, err := p.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "An!KOTO error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "AniSoro error: %v\n", err)
 		os.Exit(1)
 	}
 }

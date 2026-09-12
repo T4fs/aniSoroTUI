@@ -30,7 +30,7 @@ const (
 
 const pageSize = 10
 
-var Version = "1.0.0-anikoto"
+var Version = "1.0.0-anisoro"
 
 var debugLog *log.Logger
 
