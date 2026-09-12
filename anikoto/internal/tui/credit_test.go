@@ -34,8 +34,8 @@ func TestCreditRendersAsButton(t *testing.T) {
 		t.Fatalf("expected exactly one credit line, got %d\n%q", len(creditLines), out)
 	}
 	creditLine := creditLines[0]
-	if !strings.Contains(creditLine, "94") {
-		t.Errorf("credit not rendered in blue: %q", creditLine)
+	if !strings.Contains(creditLine, "93") {
+		t.Errorf("credit not rendered in yellow: %q", creditLine)
 	}
 	hasBorder := strings.Contains(out, "╭") || strings.Contains(out, "╰")
 	if !hasBorder {
@@ -44,8 +44,8 @@ func TestCreditRendersAsButton(t *testing.T) {
 
 	m.creditHover = true
 	hoverOut := m.View()
-	if !strings.Contains(hoverOut, "104") {
-		t.Errorf("hovered credit button not filled with blue background\n%q", hoverOut)
+	if !strings.Contains(hoverOut, "103") {
+		t.Errorf("hovered credit button not filled with yellow background\n%q", hoverOut)
 	}
 }
 

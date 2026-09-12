@@ -127,7 +127,7 @@ func NewModel(scrapers *scraper.UnifiedScraper) Model {
 	ti.CharLimit = 100
 	ti.Width = 60
 	ti.Prompt = "> "
-	ti.TextStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "4", Dark: "12"})
+	ti.TextStyle = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "11", Dark: "11"})
 	ti.Focus()
 
 	return Model{

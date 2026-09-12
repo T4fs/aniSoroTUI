@@ -3,10 +3,10 @@ package tui
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	AccentColor    = lipgloss.AdaptiveColor{Light: "4", Dark: "12"}
+	AccentColor    = lipgloss.AdaptiveColor{Light: "11", Dark: "11"}
 	DimColor       = lipgloss.AdaptiveColor{Light: "245", Dark: "240"}
-	ErrorColor     = lipgloss.AdaptiveColor{Light: "1", Dark: "9"}
-	HighlightColor = lipgloss.AdaptiveColor{Light: "3", Dark: "11"}
+	ErrorColor     = lipgloss.AdaptiveColor{Light: "11", Dark: "11"}
+	HighlightColor = lipgloss.AdaptiveColor{Light: "11", Dark: "11"}
 )
 
 var (

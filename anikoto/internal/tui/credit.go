@@ -15,14 +15,14 @@ var creditText = "made by t4fs"
 
 var CreditButtonStyle = lipgloss.NewStyle().
 	Border(lipgloss.RoundedBorder(), true).
-	BorderForeground(lipgloss.Color("12")).
-	Foreground(lipgloss.Color("12")).
+	BorderForeground(lipgloss.Color("11")).
+	Foreground(lipgloss.Color("11")).
 	Padding(0, 1)
 
 var CreditButtonHoverStyle = lipgloss.NewStyle().
 	Border(lipgloss.RoundedBorder(), true).
-	BorderForeground(lipgloss.Color("12")).
-	Background(lipgloss.Color("12")).
+	BorderForeground(lipgloss.Color("11")).
+	Background(lipgloss.Color("11")).
 	Foreground(lipgloss.Color("0")).
 	Padding(0, 1)
 
