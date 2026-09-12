@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 	"time"
 )
@@ -9,9 +10,9 @@ import (
 func TestAnidbPipeline(t *testing.T) {
 	s := NewAnidbScraper()
 
-	t.Log("Searching for naruto...")
+	t.Log("Searching for one piece...")
 	t0 := time.Now()
-	results, err := s.Search("naruto", false)
+	results, err := s.Search("one piece", false)
 	t.Logf("Search: %d results, err=%v, took=%v", len(results), err, time.Since(t0))
 	if err != nil {
 		t.Fatalf("Search error: %v", err)
@@ -22,13 +23,13 @@ func TestAnidbPipeline(t *testing.T) {
 
 	found := false
 	for _, r := range results {
-		t.Logf("Result: %q | %s | score=%.1f eps=%d type=%s studio=%q status=%q", r.Title, r.URL, r.Score, r.EpisodeCount, r.Type, r.Studio, r.Status)
-		if r.Title == "Naruto" {
+		t.Logf("Result: %q | %s | eps=%d type=%s genres=%v", r.Title, r.URL, r.EpisodeCount, r.Type, r.Genres)
+		if r.Title == "One Piece" {
 			found = true
 		}
 	}
 	if !found {
-		t.Log("Naruto not in results (not failing)")
+		t.Log("One Piece not in results (not failing)")
 	}
 
 	r := results[0]
@@ -65,35 +66,23 @@ func TestAnidbPipeline(t *testing.T) {
 	}
 }
 
-func TestAnidbDubPipeline(t *testing.T) {
+func TestAnidbDubUnavailable(t *testing.T) {
 	s := NewAnidbScraper()
 
-	results, err := s.Search("naruto", true)
-	if err != nil {
-		t.Fatalf("Search error: %v", err)
+	_, err := s.GetEpisodes("one-piece", true)
+	if err == nil {
+		t.Fatal("expected a no-dub error, got nil")
 	}
-	if len(results) == 0 {
-		t.Fatal("No search results")
-	}
-
-	t.Log("Loading dubbed episodes...")
-	eps, err := s.GetEpisodes(results[0].URL, true)
-	t.Logf("Dub episodes: %d, err=%v", len(eps), err)
-	if err != nil {
-		t.Fatalf("GetEpisodes(dub) error: %v", err)
-	}
-	if len(eps) == 0 {
-		t.Fatal("No dub episodes")
+	if !strings.Contains(err.Error(), "no dub") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 
-	t.Log("Fetching dub video URL...")
-	sources, err := s.GetVideoURL(eps[0].URL, true)
-	t.Logf("Dub sources: %d, err=%v", len(sources), err)
-	if err != nil {
-		t.Fatalf("GetVideoURL(dub) error: %v", err)
+	_, err = s.GetVideoURL("https://anidb.se/one-piece-episode-1177-english-subbed/", true)
+	if err == nil {
+		t.Fatal("expected a no-dub error for video, got nil")
 	}
-	for i, src := range sources {
-		t.Logf("  [%d] %s %s: %s", i, src.Quality, src.Type, src.URL)
+	if !strings.Contains(err.Error(), "no dub") {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

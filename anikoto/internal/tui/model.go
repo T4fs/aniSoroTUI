@@ -565,7 +565,7 @@ func (m Model) handleEnter() (tea.Model, tea.Cmd) {
 
 		m.currentSource = m.scrapers.GetScraper(anime.Source)
 		if m.currentSource == nil {
-			m.currentSource = m.scrapers.GetScraper("anidb.app")
+			m.currentSource = m.scrapers.GetScraper("anidb.se")
 		}
 		return m, tea.Batch(m.loadEpisodes(anime.URL), tickCmd())
 

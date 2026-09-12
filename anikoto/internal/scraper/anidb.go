@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -11,15 +12,23 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/anitui/anitui/internal/models"
 )
 
 const (
-	anidbBase = "https://anidb.app"
+	anidbBase = "https://anidb.se"
 	anidbUA   = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+)
+
+var (
+	anidbEpNumRe = regexp.MustCompile(`-episode-(\d+)-`)
+	anidbEplRe   = regexp.MustCompile(`<li data-index="\d+">\s*<a href="([^"]+)">[\s\S]*?<div class="epl-num">([^<]*)</div>\s*<div class="epl-title">([^<]*)</div>`)
+	anidbMirrorRe = regexp.MustCompile(`<option value="([^"]+)"\s+data-index="\d+"[^>]*>\s*([^<]*)</option>`)
+	anidbDataSrcRe = regexp.MustCompile(`data-src="([^"]+)"`)
+	anidbIframeRe  = regexp.MustCompile(`<iframe[^>]*src="([^"]+)"`)
+	anidbFileRe    = regexp.MustCompile(`file:\s*'([^']*)'`)
 )
 
 type AnidbScraper struct {
@@ -33,16 +42,65 @@ func NewAnidbScraper() *AnidbScraper {
 }
 
 func (s *AnidbScraper) Name() string {
-	return "anidb.app"
+	return "anidb.se"
 }
 
 func (s *AnidbScraper) get(rawURL string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, rawURL, nil)
+	var lastErr error
+	for attempt := 0; attempt < 3; attempt++ {
+		req, err := http.NewRequest(http.MethodGet, rawURL, nil)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("User-Agent", anidbUA)
+		req.Header.Set("Accept", "text/html,application/json")
+
+		resp, err := s.client.Do(req)
+		if err != nil {
+			lastErr = err
+			time.Sleep(time.Duration(attempt+1) * 600 * time.Millisecond)
+			continue
+		}
+		if resp.StatusCode >= 500 {
+			lastErr = fmt.Errorf("anidb.se returned status %d", resp.StatusCode)
+			resp.Body.Close()
+			time.Sleep(time.Duration(attempt+1) * 800 * time.Millisecond)
+			continue
+		}
+		if resp.StatusCode != http.StatusOK {
+			resp.Body.Close()
+			return nil, fmt.Errorf("anidb.se returned status %d", resp.StatusCode)
+		}
+
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			return nil, err
+		}
+		if strings.Contains(string(body), "Just a moment") {
+			return nil, fmt.Errorf("anidb.se blocked the request (cloudflare challenge)")
+		}
+		return body, nil
+	}
+	if lastErr == nil {
+		lastErr = fmt.Errorf("anidb.se request failed")
+	}
+	return nil, lastErr
+}
+
+func (s *AnidbScraper) postSearch(query string) ([]byte, error) {
+	form := url.Values{}
+	form.Set("action", "ts_ac_do_search")
+	form.Set("ts_ac_query", query)
+
+	req, err := http.NewRequest(http.MethodPost, anidbBase+"/wp-admin/admin-ajax.php", strings.NewReader(form.Encode()))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("User-Agent", anidbUA)
-	req.Header.Set("Accept", "text/html,application/json")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("Accept", "application/json,text/javascript,*/*;q=0.8")
 
 	resp, err := s.client.Do(req)
 	if err != nil {
@@ -51,214 +109,143 @@ func (s *AnidbScraper) get(rawURL string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("anidb.app returned status %d", resp.StatusCode)
+		return nil, fmt.Errorf("anidb.se search returned status %d", resp.StatusCode)
 	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	if strings.Contains(string(body), "Just a moment") {
-		return nil, fmt.Errorf("anidb.app blocked the request (cloudflare challenge)")
+		return nil, fmt.Errorf("anidb.se blocked the request (cloudflare challenge)")
 	}
 	return body, nil
 }
 
+type anidbSearchJSON struct {
+	Anime []struct {
+		All []struct {
+			PostTitle  string `json:"post_title"`
+			PostLink   string `json:"post_link"`
+			PostGenres string `json:"post_genres"`
+			PostType   string `json:"post_type"`
+			PostLatest string `json:"post_latest"`
+		} `json:"all"`
+	} `json:"anime"`
+}
+
 func (s *AnidbScraper) Search(query string, dub bool) ([]models.Anime, error) {
-	body, err := s.get(anidbBase + "/browse?q=" + url.QueryEscape(query))
+	body, err := s.postSearch(query)
 	if err != nil {
 		return nil, err
 	}
-	page := string(body)
 
-	re := regexp.MustCompile(`anime/([a-z0-9-]+-[0-9]+)"[^>]*title="([^"]+)"`)
+	var parsed anidbSearchJSON
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return nil, fmt.Errorf("parse search results: %w", err)
+	}
+
+	results := make([]models.Anime, 0, 10)
 	seen := make(map[string]bool)
-	animeList := make([]models.Anime, 0, 20)
-	for _, m := range re.FindAllStringSubmatch(page, -1) {
-		slug := m[1]
-		if seen[slug] {
-			continue
-		}
-		seen[slug] = true
-		title := strings.TrimSpace(html.UnescapeString(m[2]))
-		if title == "" {
-			continue
-		}
-		animeList = append(animeList, models.Anime{
-			Title:  title,
-			URL:    slug,
-			Source: s.Name(),
-		})
-	}
+	for _, group := range parsed.Anime {
+		for _, a := range group.All {
+			title := strings.TrimSpace(a.PostTitle)
+			slug := anidbSlugFromLink(a.PostLink)
+			if title == "" || slug == "" || seen[slug] {
+				continue
+			}
+			seen[slug] = true
 
-	var wg sync.WaitGroup
-	sem := make(chan struct{}, 5)
-	for i := range animeList {
-		wg.Add(1)
-		go func(idx int) {
-			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
+			latest := 0
+			if n, err := strconv.Atoi(a.PostLatest); err == nil {
+				latest = n
+			}
 
-			detail := s.fetchDetail(animeList[idx].URL)
-			if detail == nil {
-				return
+			var genres []string
+			for _, g := range strings.Split(a.PostGenres, ",") {
+				if g = strings.TrimSpace(g); g != "" {
+					genres = append(genres, g)
+				}
 			}
-			if detail.Title != "" {
-				animeList[idx].Title = detail.Title
-			}
-			if detail.Score > 0 {
-				animeList[idx].Score = detail.Score
-			}
-			if detail.EpisodeCount > 0 {
-				animeList[idx].EpisodeCount = detail.EpisodeCount
-			}
-			animeList[idx].Synopsis = detail.Synopsis
-			if len(detail.Genres) > 0 {
-				animeList[idx].Genres = detail.Genres
-			}
-			if detail.Type != "" {
-				animeList[idx].Type = detail.Type
-			}
-			animeList[idx].Studio = detail.Studio
-			if detail.Status != "" {
-				animeList[idx].Status = detail.Status
-			}
-			if detail.EpisodeCount > 0 {
-				animeList[idx].Description = fmt.Sprintf("%d episodes", detail.EpisodeCount)
-			}
-		}(i)
-	}
-	wg.Wait()
 
-	return animeList, nil
-}
-
-type anidbDetail struct {
-	Title        string
-	Score        float64
-	EpisodeCount int
-	Synopsis     string
-	Genres       []string
-	Type         string
-	Studio       string
-	Status       string
-}
-
-func (s *AnidbScraper) fetchDetail(slug string) *anidbDetail {
-	body, err := s.get(anidbBase + "/anime/" + slug)
-	if err != nil {
-		return nil
-	}
-	page := string(body)
-
-	detail := &anidbDetail{}
-
-	if m := regexp.MustCompile(`"@type":\s*"(?:TVSeries|Movie|TVMovie)"[\s\S]*?"name":\s*"([^"]*)"`).FindStringSubmatch(page); m != nil {
-		detail.Title = strings.TrimSpace(html.UnescapeString(m[1]))
-	}
-	if m := regexp.MustCompile(`"description":\s*"([^"]*)"`).FindStringSubmatch(page); m != nil {
-		detail.Synopsis = strings.TrimSpace(html.UnescapeString(strings.ReplaceAll(m[1], `\&#`, `&#`)))
-	}
-	if m := regexp.MustCompile(`"genre":\s*\[([^\]]*)\]`).FindStringSubmatch(page); m != nil {
-		for _, g := range regexp.MustCompile(`"([^"]+)"`).FindAllStringSubmatch(m[1], -1) {
-			gName := strings.TrimSpace(html.UnescapeString(g[1]))
-			if gName != "" {
-				detail.Genres = append(detail.Genres, gName)
+			anime := models.Anime{
+				Title:        title,
+				URL:          slug,
+				Source:       s.Name(),
+				EpisodeCount: latest,
+				Type:         a.PostType,
+				Genres:       genres,
 			}
-		}
-	}
-	if m := regexp.MustCompile(`href="/browse\?type=([^"]+)"[^>]*class="badge[^"]*"[^>]*>([^<]+)</a>`).FindStringSubmatch(page); m != nil {
-		detail.Type = strings.TrimSpace(html.UnescapeString(m[2]))
-	}
-	if m := regexp.MustCompile(`href="/browse\?status=([^"]+)"[^>]*class="badge[^"]*"[^>]*>([^<]+)</a>`).FindStringSubmatch(page); m != nil {
-		detail.Status = mapStatus(strings.TrimSpace(html.UnescapeString(m[2])))
-	}
-	if m := regexp.MustCompile(`<svg class="w-3 h-3 text-yellow-400"[\s\S]*?</svg>([0-9.]+)</span>`).FindStringSubmatch(page); m != nil {
-		if f, err := strconv.ParseFloat(m[1], 64); err == nil {
-			detail.Score = f
-		}
-	}
-	if m := regexp.MustCompile(`href="/studios/[0-9]+"[^>]*>([^<]+)</a>`).FindStringSubmatch(page); m != nil {
-		detail.Studio = strings.TrimSpace(html.UnescapeString(m[1]))
-	}
-
-	id := animeIDFromSlug(slug)
-	if id != "" {
-		if eps, err := s.fetchEpisodeIDs(id); err == nil {
-			detail.EpisodeCount = len(eps)
+			if latest > 0 {
+				anime.Description = fmt.Sprintf("Up to EP %d", latest)
+			}
+			results = append(results, anime)
 		}
 	}
 
-	return detail
+	if len(results) > 15 {
+		results = results[:15]
+	}
+	return results, nil
 }
 
-func animeIDFromSlug(slug string) string {
-	m := regexp.MustCompile(`-(\d+)$`).FindStringSubmatch(slug)
-	if m == nil {
-		return ""
+func anidbSlugFromLink(link string) string {
+	prefix := anidbBase + "/anime/"
+	if i := strings.Index(link, prefix); i >= 0 {
+		slug := link[i+len(prefix):]
+		slug = strings.TrimSuffix(slug, "/")
+		if slug != "" {
+			return slug
+		}
 	}
-	return m[1]
-}
-
-type anidbEpisodesResponse struct {
-	Episodes []struct {
-		ID     int `json:"id"`
-		Number int `json:"number"`
-		Filler bool `json:"filler"`
-	} `json:"episodes"`
-}
-
-func (s *AnidbScraper) fetchEpisodeIDs(animeID string) ([]int, error) {
-	body, err := s.get(fmt.Sprintf("%s/api/frontend/anime/%s/episodes", anidbBase, animeID))
-	if err != nil {
-		return nil, err
-	}
-	var result anidbEpisodesResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("parse episodes: %w", err)
-	}
-	ids := make([]int, 0, len(result.Episodes))
-	for _, e := range result.Episodes {
-		ids = append(ids, e.ID)
-	}
-	return ids, nil
+	return ""
 }
 
 func (s *AnidbScraper) GetEpisodes(animeURL string, dub bool) ([]models.Episode, error) {
-	id := animeIDFromSlug(animeURL)
-	if id == "" {
-		return nil, fmt.Errorf("could not extract anime id from %q", animeURL)
+	if dub {
+		return nil, fmt.Errorf("no dub available for this anime (anidb.se is sub-only)")
 	}
 
-	body, err := s.get(fmt.Sprintf("%s/api/frontend/anime/%s/episodes", anidbBase, id))
+	slug := animeURL
+	if strings.HasPrefix(animeURL, anidbBase+"/anime/") {
+		slug = anidbSlugFromLink(animeURL)
+	}
+	if slug == "" {
+		return nil, fmt.Errorf("could not extract anime slug from %q", animeURL)
+	}
+
+	body, err := s.get(anidbBase + "/anime/" + url.PathEscape(slug))
 	if err != nil {
 		return nil, err
 	}
-	var result anidbEpisodesResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("parse episodes: %w", err)
-	}
+	page := string(body)
 
-	episodes := make([]models.Episode, 0, len(result.Episodes))
-	for _, e := range result.Episodes {
+	episodes := make([]models.Episode, 0, 8)
+	seen := make(map[string]bool)
+	for _, m := range anidbEplRe.FindAllStringSubmatch(page, -1) {
+		href := html.UnescapeString(m[1])
+		num := strings.TrimSpace(m[2])
+		title := strings.TrimSpace(html.UnescapeString(m[3]))
+		if href == "" || seen[href] {
+			continue
+		}
+		if num == "" {
+			if nm := anidbEpNumRe.FindStringSubmatch(href); nm != nil {
+				num = nm[1]
+			}
+		}
+		if num == "" {
+			continue
+		}
+		seen[href] = true
 		episodes = append(episodes, models.Episode{
-			Number: fmt.Sprintf("EP %d", e.Number),
-			URL:    strconv.Itoa(e.ID),
+			Number: "EP " + num,
+			Title:  title,
+			URL:    href,
 		})
 	}
 
-	if dub {
-		if len(episodes) == 0 {
-			return episodes, nil
-		}
-		hasDub, err := s.hasLanguage(episodes[0].URL, "eng")
-		if err != nil {
-			return nil, err
-		}
-		if !hasDub {
-			return nil, fmt.Errorf("no dub available for this anime")
-		}
+	if len(episodes) == 0 {
+		return nil, fmt.Errorf("no episodes found for %q", slug)
 	}
 
 	sort.Slice(episodes, func(i, j int) bool {
@@ -266,85 +253,91 @@ func (s *AnidbScraper) GetEpisodes(animeURL string, dub bool) ([]models.Episode,
 		nj, _ := strconv.ParseFloat(strings.TrimPrefix(episodes[j].Number, "EP "), 64)
 		return ni < nj
 	})
-
 	return episodes, nil
 }
 
-type anidbLanguagesResponse struct {
-	Languages []struct {
-		Code     string `json:"code"`
-		Name     string `json:"name"`
-		EmbedURL string `json:"embed_url"`
-	} `json:"languages"`
-}
-
-func (s *AnidbScraper) hasLanguage(episodeID, code string) (bool, error) {
-	body, err := s.get(fmt.Sprintf("%s/api/frontend/episode/%s/languages", anidbBase, episodeID))
-	if err != nil {
-		return false, err
-	}
-	var result anidbLanguagesResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return false, fmt.Errorf("parse languages: %w", err)
-	}
-	for _, l := range result.Languages {
-		if l.Code == code {
-			return true, nil
-		}
-	}
-	return false, nil
-}
-
 func (s *AnidbScraper) GetVideoURL(episodeURL string, dub bool) ([]models.VideoSource, error) {
-	lang := "jpn"
 	if dub {
-		lang = "eng"
+		return nil, fmt.Errorf("no dub available for this anime (anidb.se is sub-only)")
 	}
 
-	body, err := s.get(fmt.Sprintf("%s/api/frontend/episode/%s/languages", anidbBase, episodeURL))
+	body, err := s.get(episodeURL)
 	if err != nil {
 		return nil, err
 	}
-	var result anidbLanguagesResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return nil, fmt.Errorf("parse languages: %w", err)
-	}
+	page := string(body)
 
-	embed := ""
-	for _, l := range result.Languages {
-		if l.Code == lang {
-			embed = l.EmbedURL
-			break
+	var sources []models.VideoSource
+	seen := make(map[string]bool)
+	for _, m := range anidbMirrorRe.FindAllStringSubmatch(page, -1) {
+		encoded := m[1]
+		serverName := strings.TrimSpace(m[2])
+		if encoded == "" {
+			continue
+		}
+
+		decoded, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			continue
+		}
+		embed := string(decoded)
+
+		mediaURL := ""
+		if ds := anidbDataSrcRe.FindStringSubmatch(embed); ds != nil {
+			mediaURL = html.UnescapeString(ds[1])
+		} else if fr := anidbIframeRe.FindStringSubmatch(embed); fr != nil {
+			iframeURL := html.UnescapeString(fr[1])
+			if !strings.HasPrefix(iframeURL, "http") {
+				iframeURL = anidbBase + iframeURL
+			}
+			if ib, err := s.get(iframeURL); err == nil {
+				if ds := anidbDataSrcRe.FindStringSubmatch(string(ib)); ds != nil {
+					mediaURL = html.UnescapeString(ds[1])
+				} else if fl := anidbFileRe.FindStringSubmatch(string(ib)); fl != nil {
+					mediaURL = html.UnescapeString(fl[1])
+				}
+			}
+		}
+
+		if mediaURL == "" || seen[mediaURL] {
+			continue
+		}
+		seen[mediaURL] = true
+
+		if strings.Contains(mediaURL, ".m3u8") {
+			pl, err := s.get(mediaURL)
+			if err != nil {
+				continue
+			}
+			variants := parseAnidbVariants(string(pl), mediaURL)
+			if len(variants) > 0 {
+				sources = append(sources, variants...)
+			} else {
+				sources = append(sources, models.VideoSource{URL: mediaURL, Quality: serverName, Type: "hls"})
+			}
+		} else {
+			sources = append(sources, models.VideoSource{
+				URL:     mediaURL,
+				Quality: serverName,
+				Type:    "mp4",
+			})
 		}
 	}
-	if embed == "" {
-		return nil, fmt.Errorf("no %s audio track available for this episode", lang)
-	}
 
-	embedBody, err := s.get(embed)
-	if err != nil {
-		return nil, err
-	}
-	fileMatch := regexp.MustCompile(`file: '([^']*)'`).FindSubmatch(embedBody)
-	if fileMatch == nil {
-		return nil, fmt.Errorf("could not find stream url on embed page")
-	}
-	masterURL := string(fileMatch[1])
-	if !strings.HasPrefix(masterURL, "http") {
-		masterURL = anidbBase + masterURL
-	}
-
-	playlistBody, err := s.get(masterURL)
-	if err != nil {
-		return nil, err
-	}
-
-	sources := parseAnidbVariants(string(playlistBody), masterURL)
 	if len(sources) == 0 {
-		sources = []models.VideoSource{{URL: masterURL, Quality: "default", Type: "hls"}}
+		return nil, fmt.Errorf("no playable video server found on this episode page")
 	}
 
-	return sources, nil
+	dedup := make([]models.VideoSource, 0, len(sources))
+	for _, src := range sources {
+		key := src.URL + "|" + src.Quality
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		dedup = append(dedup, src)
+	}
+	return dedup, nil
 }
 
 var anidbVariantRe = regexp.MustCompile(`(?m)^#EXT-X-STREAM-INF:[^\n]*RESOLUTION=(\d+)x(\d+)[^\n]*\n\s*(https?://\S+)`)

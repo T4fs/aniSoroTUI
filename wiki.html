@@ -135,6 +135,18 @@
   <p class="secsub">Newest first. Every release gets an entry here.</p>
 
   <div class="entry glass">
+    <span class="serial">Serial #10</span>
+    <span class="date">2026-09-12</span>
+    <h3>anidb.se — the source is live again</h3>
+    <ul>
+      <li>anidb.app has been offline; the app now uses <strong>anidb.se</strong> (the current anidb domain) as its single source.</li>
+      <li>Search uses the site's live-search endpoint (<code>ts_ac_do_search</code>); episode lists are read from each anime page, and each episode page serves its video server as base64 embed markup containing a direct <strong>MP4</strong> stream — no HLS/CDN tricks needed.</li>
+      <li>Playback verified live for One Piece: direct <code>my.1anime.site</code> MP4, no referer required.</li>
+      <li>Notes: anidb.se lists only the few most recent episodes per series, and its catalog is currently <strong>sub-only</strong> (the dub toggle reports "no dub available").</li>
+    </ul>
+  </div>
+
+  <div class="entry glass">
     <span class="serial">Serial #9</span>
     <span class="date">2026-09-12</span>
     <h3>Restored to the 2026-08-14 baseline + serial numbers</h3>
@@ -244,7 +256,7 @@
     <table>
       <tr><th>screen</th><th>what it does</th></tr>
       <tr><td>Home</td><td>logo box, search input, and the clickable credit button</td></tr>
-      <tr><td>Results</td><td>search results from anidb.app, pageable (10 per page)</td></tr>
+      <tr><td>Results</td><td>search results from anidb.se, pageable (10 per page)</td></tr>
       <tr><td>Episode list</td><td>episodes of the selected anime, sub/dub toggle, synopsis</td></tr>
       <tr><td>Watching</td><td>launches the selected video source in your media player</td></tr>
       <tr><td>Help</td><td>keybinding popup (<code>?</code>)</td></tr>
@@ -268,12 +280,12 @@
 
     <h3>How streaming works</h3>
     <ol>
-      <li>Search: <code>GET anidb.app/browse?q=…</code> → anime list.</li>
-      <li>Episodes: <code>GET anidb.app/api/frontend/anime/{id}/episodes</code>.</li>
-      <li>Languages: <code>GET anidb.app/api/frontend/episode/{id}/languages</code> (sub/dub).</li>
-      <li>Stream: the embed page leaks a <code>master.m3u8</code> HLS URL on <code>hls.anidb.app</code>; qualities (1080p/720p/360p) are read from the manifest and passed to your player.</li>
+      <li>Search: <code>POST anidb.se/wp-admin/admin-ajax.php</code> with <code>action=ts_ac_do_search</code> → live-search JSON (title, slug, type, genres, latest episode).</li>
+      <li>Episodes: the anime page (<code>/anime/&lt;slug&gt;/</code>) carries the episode list folded into <code>.eplister</code> rows (newest ~4) linking to each episode post.</li>
+      <li>Video: each episode page embeds its video server as a base64 string inside <code>&lt;select class="mirror"&gt;</code>; decoded, it yields the player markup with a direct <code>data-src</code> — currently <strong>MP4</strong> on <code>my.1anime.site</code> (HLS mirrors, if present, are handled too).</li>
+      <li>Stream: the plain URL is passed to your player — no referer or user-agent tricks needed.</li>
     </ol>
-    <p>The player is launched with the plain stream URL — no referer or user-agent tricks needed.</p>
+    <p>anidb.se today lists only the most recent episodes per series and is <strong>sub-only</strong> (the dub toggle reports "no dub available").</p>
 
     <h3>Environment variables</h3>
     <table>
@@ -284,7 +296,7 @@
 
     <h3>Project layout</h3>
     <pre>anikoto/
-├── cmd/anitui        # entrypoint (wires the anidb.app scraper, enables mouse)
+├── cmd/anitui        # entrypoint (wires the anidb.se scraper, enables mouse)
 ├── internal/scraper  # anidb.go source + tests; anikoto.go/allanime.go are dead code
 ├── internal/tui      # bubbletea UI: screens, home layout, credit button, mouse
 ├── internal/player   # mpv / vlc / iina / haruna detection
@@ -319,7 +331,7 @@
     <h3><span class="st ok">FIXED</span> searches returned nothing / Cloudflare wall</h3>
     <ul>
       <li><strong>Cause:</strong> the old source (anikototv.to) was dead and its CDN poisoned stream URLs.</li>
-      <li><strong>Fix:</strong> the app now scrapes <strong>anidb.app</strong> with a plain Go HTTP client — verified working without Cloudflare workarounds. Pipeline covered by <code>TestAnidbPipeline</code>.</li>
+      <li><strong>Fix:</strong> the app now scrapes <strong>anidb.se</strong> with a plain Go HTTP client — verified working without Cloudflare workarounds. Pipeline covered by <code>TestAnidbPipeline</code>.</li>
     </ul>
   </div>
 
