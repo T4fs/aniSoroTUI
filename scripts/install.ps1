@@ -1,10 +1,10 @@
-# An!KOTO self-contained installer for a brand-new Windows machine.
+# anikotoTUI self-contained installer for a brand-new Windows machine.
 # - No Go, no git, no software required (built-in curl.exe + tar/Expand-Archive only).
 # - Downloads a standalone Go toolchain, fetches the source as a zip,
 #   builds anitui.exe, installs it, and creates an `anikoto` command on PATH.
 #
 # Usage (copy-paste into PowerShell):
-#   irm https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/T4fs/anikotoTUI/main/scripts/install.ps1 | iex
 
 $ErrorActionPreference = 'Stop'
 
@@ -14,7 +14,7 @@ function Die($m)  { Write-Host "error: $m" -ForegroundColor Red; exit 1 }
 
 $AnituiHome = Join-Path $HOME '.anitui'
 
-Say "An!KOTO installer for Windows"
+Say "anikotoTUI installer for Windows"
 
 # --- detect architecture ---
 $GOARCH = 'amd64'
@@ -56,11 +56,11 @@ if (-not $gobin) {
 
 if (-not (Get-Command go -ErrorAction SilentlyContinue)) { Die "Go is unavailable after setup." }
 
-# --- 2. fetch the An!KOTO source (zip - no git needed) ---
+# --- 2. fetch the anikotoTUI source (zip - no git needed) ---
 New-Item -ItemType Directory -Force -Path $AnituiHome | Out-Null
-Say "Downloading the An!KOTO source..."
+Say "Downloading the anikotoTUI source..."
 $srcZip = Join-Path $AnituiHome 'src.zip'
-curl.exe -fsSL "https://codeload.github.com/T4fs/Anikoto-in-Terminal/zip/refs/heads/main" -o $srcZip
+curl.exe -fsSL "https://codeload.github.com/T4fs/anikotoTUI/zip/refs/heads/main" -o $srcZip
 if ($LASTEXITCODE -ne 0) { Die "failed to download the source." }
 
 $srcRoot = Join-Path $AnituiHome 'src'
@@ -69,14 +69,14 @@ New-Item -ItemType Directory -Force -Path $srcRoot | Out-Null
 Expand-Archive -Path $srcZip -DestinationPath $srcRoot -Force
 Remove-Item -Force $srcZip -ErrorAction SilentlyContinue
 
-$proj = Get-ChildItem -Path $srcRoot -Directory | Where-Object { $_.Name -like '*Anikoto-in-Terminal*' } | Select-Object -First 1
+$proj = Get-ChildItem -Path $srcRoot -Directory | Where-Object { $_.Name -like '*anikotoTUI*' } | Select-Object -First 1
 if (-not $proj) { Die "could not locate the source after extraction." }
 $module = Join-Path $proj.FullName 'anikoto'
 
 # --- 3. build ---
 $binDir = Join-Path $AnituiHome 'bin'
 New-Item -ItemType Directory -Force -Path $binDir | Out-Null
-Say "Building An!KOTO (this can take a minute)..."
+Say "Building anikotoTUI (this can take a minute)..."
 $env:CGO_ENABLED = '0'
 Push-Location $module
 try {
@@ -102,5 +102,5 @@ if ($userPath -notlike "*$shimDir*") {
 }
 
 Write-Host ""
-Write-Host "An!KOTO installed successfully." -ForegroundColor Green
+Write-Host "anikotoTUI installed successfully." -ForegroundColor Green
 Write-Host "Run 'anikoto' in a new terminal." -ForegroundColor Cyan

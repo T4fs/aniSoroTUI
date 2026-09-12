@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# An!KOTO self-contained installer for a brand-new Linux/macOS machine.
+# anikotoTUI self-contained installer for a brand-new Linux/macOS machine.
 # - No package manager, no git, no C compiler, no existing Go required.
 # - Downloads a standalone Go toolchain, fetches the source as a tarball,
 #   builds a static binary, and adds it to your PATH.
 #
 # Usage (copy-paste into a terminal):
-#   curl -fsSL https://raw.githubusercontent.com/T4fs/Anikoto-in-Terminal/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/T4fs/anikotoTUI/main/scripts/install.sh | bash
 #
 set -euo pipefail
 
@@ -23,7 +23,7 @@ UNAME_M=$(uname -m)
 case "$UNAME_S" in
   Linux)  GOOS=linux ;;
   Darwin) GOOS=darwin ;;
-  *) die "unsupported OS: $UNAME_S (An!KOTO supports Linux and macOS)" ;;
+  *) die "unsupported OS: $UNAME_S (anikotoTUI supports Linux and macOS)" ;;
 esac
 case "$UNAME_M" in
   x86_64|amd64)  GOARCH=amd64 ;;
@@ -74,17 +74,17 @@ fi
 command -v go >/dev/null 2>&1 || die "Go is still unavailable after setup."
 
 # ---------------------------------------------------------------------------
-# 3. fetch the An!KOTO source (tarball — no git needed)
+# 3. fetch the anikotoTUI source (tarball — no git needed)
 # ---------------------------------------------------------------------------
 ANITUI_HOME="${ANITUI_HOME:-$HOME/.anitui}"
 mkdir -p "$ANITUI_HOME"
-say "Downloading the An!KOTO source..."
-fetch "https://codeload.github.com/T4fs/Anikoto-in-Terminal/tar.gz/refs/heads/main" "$ANITUI_HOME/anikoto.tgz"
+say "Downloading the anikotoTUI source..."
+fetch "https://codeload.github.com/T4fs/anikotoTUI/tar.gz/refs/heads/main" "$ANITUI_HOME/anikoto.tgz"
 SRC_DIR="$ANITUI_HOME/src"
 rm -rf "$SRC_DIR"; mkdir -p "$SRC_DIR"
 tar -C "$SRC_DIR" -xzf "$ANITUI_HOME/anikoto.tgz"
 rm -f "$ANITUI_HOME/anikoto.tgz"
-PROJ=$(find "$SRC_DIR" -maxdepth 1 -type d -iname '*Anikoto-in-Terminal*' | head -n1)
+PROJ=$(find "$SRC_DIR" -maxdepth 1 -type d -iname '*anikotoTUI*' | head -n1)
 [ -n "$PROJ" ] || die "could not locate the source after extraction."
 cd "$PROJ/anikoto"
 
@@ -93,7 +93,7 @@ cd "$PROJ/anikoto"
 # ---------------------------------------------------------------------------
 BIN_DIR="$ANITUI_HOME/bin"
 mkdir -p "$BIN_DIR"
-say "Building An!KOTO (this can take a minute)..."
+say "Building anikotoTUI (this can take a minute)..."
 CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -ldflags="-s -w" -o "$BIN_DIR/anitui" ./cmd/anitui
 say "Built $BIN_DIR/anitui"
 
@@ -106,7 +106,7 @@ PROFILE=""
 [ -z "$PROFILE" ] && [ -f "$HOME/.bashrc" ] && PROFILE="$HOME/.bashrc"
 if [ -n "$PROFILE" ]; then
   if ! grep -qF "$BIN_DIR" "$PROFILE" 2>/dev/null; then
-    printf '\n# added by the An!KOTO installer\n%s\n' "$BIN_LINE" >> "$PROFILE"
+    printf '\n# added by the anikotoTUI installer\n%s\n' "$BIN_LINE" >> "$PROFILE"
     say "Added $BIN_DIR to your PATH in $PROFILE"
   fi
 fi
@@ -114,7 +114,7 @@ export PATH="$BIN_DIR:$PATH"
 
 printf '%b\n' "${GRN}"
 printf '%s\n' "──────────────────────────────────────────────────"
-printf '%s\n' " An!KOTO installed successfully."
+printf '%s\n' " anikotoTUI installed successfully."
 printf '%s\n' "──────────────────────────────────────────────────"
 printf '%b\n' "${RST}"
 printf '   Run it now, or open a new terminal and run:\n\n'

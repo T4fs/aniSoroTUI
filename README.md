@@ -1,8 +1,8 @@
-# An!KOTO
+# anikotoTUI
 
 **watch anime in your terminal**
 
-**website:** [anikoto in terminal — An!KOTO](https://t4fs.github.io/Anikoto-in-Terminal/)
+**website:** [anikotoTUI](https://t4fs.github.io/anikotoTUI/)
 
 
 
@@ -17,7 +17,7 @@
 
 ## wiki
 
-full documentation, the update log, and bug fixes live in the [**An!KOTO wiki**](https://t4fs.github.io/Anikoto-in-Terminal/wiki.html) � every update is documented there.
+full documentation, the update log, and bug fixes live in the [**anikotoTUI wiki**](https://t4fs.github.io/anikotoTUI/wiki.html) � every update is documented there.
 
 ## getting started
 

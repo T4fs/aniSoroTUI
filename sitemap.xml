@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://t4fs.github.io/Anikoto-in-Terminal/</loc>
+    <loc>https://t4fs.github.io/anikotoTUI/</loc>
     <lastmod>2026-08-14</lastmod>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://t4fs.github.io/Anikoto-in-Terminal/wiki.html</loc>
+    <loc>https://t4fs.github.io/anikotoTUI/wiki.html</loc>
     <lastmod>2026-08-14</lastmod>
     <changefreq>weekly</changefreq>
   </url>
