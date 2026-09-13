@@ -3,26 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>aniSoroTUI | watch anime in your terminal</title>
-<meta name="description" content="aniSoroTUI: a fast open-source TUI to search, browse, and stream anime from anidb.se right in your terminal. Vim keys, sub/dub toggle, mpv playback. Built in Go with bubbletea.">
-<meta name="keywords" content="aniSoroTUI, anikoto, anikoto terminal, watch anime in terminal, anime terminal, anikoto github, anime tui, stream anime cli, anidb, go, bubbletea, mpv">
-<meta property="og:title" content="aniSoroTUI — watch anime in your terminal">
-<meta property="og:description" content="A fast TUI to search, browse, and stream anime from anidb.se — vim keys, sub/dub, mpv playback.">
+<title>aniSoroTUI | Watch Anime in Your Terminal — Free Open Source TUI</title>
+<meta name="description" content="aniSoroTUI is a free, open-source terminal user interface (TUI) to search, browse, and stream anime from anidb.se directly in your terminal. Features: Vim-style keybindings, sub/dub selection with auto-fallback, mpv/vlc/iina playback, cross-platform (Windows, Linux, macOS). Built in Go with Bubble Tea.">
+<meta name="keywords" content="aniSoroTUI, anime terminal, anime TUI, watch anime in terminal, stream anime CLI, anidb.se client, open source anime player, mpv terminal, bubbletea anime, vim keybindings anime, free anime streaming terminal">
+<meta name="author" content="t4fs">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="aniSoroTUI | Watch Anime in Your Terminal — Free Open Source TUI">
+<meta property="og:description" content="Free open-source TUI to search, browse, and stream anime from anidb.se in your terminal. Vim keys, sub/dub toggle, mpv playback. Cross-platform: Windows, Linux, macOS.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://t4fs.github.io/aniSoroTUI/">
 <meta property="og:image" content="https://raw.githubusercontent.com/T4fs/aniSoroTUI/main/assets/screenshots/screenshot_1.png">
+<meta property="og:image:width" content="1457">
+<meta property="og:image:height" content="688">
+<meta property="og:image:alt" content="aniSoroTUI terminal interface showing anime search and episode list">
+<meta property="og:site_name" content="aniSoroTUI">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="aniSoroTUI | Watch Anime in Your Terminal — Free Open Source TUI">
+<meta name="twitter:description" content="Free open-source TUI to search, browse, and stream anime from anidb.se in your terminal. Vim keys, sub/dub toggle, mpv playback.">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/T4fs/aniSoroTUI/main/assets/screenshots/screenshot_1.png">
+<meta name="twitter:site" content="@t4fs">
 <link rel="canonical" href="https://t4fs.github.io/aniSoroTUI/">
 <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/logo.svg">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "aniSoroTUI",
-  "alternateName": "anikoto",
-  "description": "aniSoroTUI: a fast open-source TUI to search, browse, and stream anime from anidb.se right in your terminal. Vim keys, sub/dub toggle, mpv playback. Built in Go with bubbletea.",
+  "alternateName": ["aniSoro", "anime terminal TUI"],
+  "description": "aniSoroTUI is a free, open-source terminal user interface (TUI) to search, browse, and stream anime from anidb.se directly in your terminal. Features Vim-style keybindings, sub/dub selection with auto-fallback to sub, mpv/vlc/iina/haruna playback. Cross-platform: Windows, Linux, macOS. Built in Go with Bubble Tea.",
   "applicationCategory": "EntertainmentApplication",
-  "operatingSystem": "Windows, Linux, macOS",
+  "operatingSystem": ["Windows", "Linux", "macOS"],
   "softwareVersion": "1.0.0",
   "url": "https://t4fs.github.io/aniSoroTUI/",
   "downloadUrl": "https://github.com/T4fs/aniSoroTUI",
@@ -34,10 +47,41 @@
     "name": "t4fs",
     "url": "https://github.com/T4fs"
   },
+  "publisher": {
+    "@type": "Organization",
+    "name": "aniSoroTUI",
+    "url": "https://github.com/T4fs/aniSoroTUI"
+  },
   "offers": {
     "@type": "Offer",
     "price": "0",
-    "priceCurrency": "USD"
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  },
+  "featureList": [
+    "Vim-style keybindings (hjkl, gg, G, /, ?)",
+    "Sub/Dub selection with auto-fallback to sub",
+    "Direct MP4 streaming from anidb.se via my.1anime.site",
+    "mpv, vlc, iina, haruna player support",
+    "Cross-platform: Windows, Linux, macOS",
+    "Zero dependencies - single binary",
+    "Open source GPL-3.0"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "aniSoroTUI",
+  "url": "https://t4fs.github.io/aniSoroTUI/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://t4fs.github.io/aniSoroTUI/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
   }
 }
 </script>
