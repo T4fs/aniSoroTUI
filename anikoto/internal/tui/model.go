@@ -1,4 +1,4 @@
-package tui
+﻿package tui
 
 import (
 	"fmt"
@@ -26,6 +26,7 @@ const (
 	ScreenEpisodes
 	ScreenLoadingEpisode
 	ScreenWatching
+	ScreenSelectDubSub
 )
 
 const pageSize = 10
@@ -109,9 +110,11 @@ type Model struct {
 	spinIndex int
 
 	lastKey string
-	dub     bool
+dub              bool
+	pendingEpisode   *models.Episode // episode selected for sub/dub choice
+	pendingDubAvail  bool            // whether dub is available for the pending episode
 
-	watching *watchingState
+	watching         *watchingState
 
 	credit      creditBounds
 	creditHover bool
@@ -338,14 +341,14 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				m.cursor = 0
 				return m, textinput.Blink
 			}
-			// ScreenLoadingEpisode — cancel video loading
+			// ScreenLoadingEpisode â€” cancel video loading
 			m.watching = nil
 			m.screen = ScreenEpisodes
 			return m, nil
 		}
 	}
 
-	// Help popup toggle — work on all screens
+	// Help popup toggle â€” work on all screens
 	if msg.String() == "?" {
 		m.showHelp = !m.showHelp
 		return m, nil
@@ -456,7 +459,7 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				}
 			}
 			return m, nil
-	}
+}
 	return m, nil
 }
 	key := msg.String()
@@ -503,6 +506,23 @@ func (m Model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 
 	return m, nil
 }
+
+func (m Model) playPendingEpisode() (tea.Model, tea.Cmd) {
+	if m.pendingEpisode == nil {
+		m.screen = ScreenEpisodes
+		return m, nil
+	}
+	m.screen = ScreenLoadingEpisode
+	m.loadingText = fmt.Sprintf("Fetching video for %s...", m.pendingEpisode.Title)
+	m.spinIndex = 0
+	m.errorMsg = ""
+	m.loadingSince = time.Now()
+	m.pendingMsg = nil
+	ep := m.pendingEpisode
+	m.pendingEpisode = nil
+	return m, tea.Batch(m.loadVideoURL(ep.URL), tickCmd())
+}
+
 
 func (m Model) handleEsc() (tea.Model, tea.Cmd) {
 	m.showHelp = false
@@ -577,13 +597,19 @@ func (m Model) handleEnter() (tea.Model, tea.Cmd) {
 			m.episodeCursor = 0
 		}
 		episode := m.episodes[m.episodeCursor]
-		m.screen = ScreenLoadingEpisode
-		m.loadingText = fmt.Sprintf("Fetching video for %s...", episode.Title)
-		m.spinIndex = 0
-		m.errorMsg = ""
-		m.loadingSince = time.Now()
-		m.pendingMsg = nil
-		return m, tea.Batch(m.loadVideoURL(episode.URL), tickCmd())
+		m.pendingEpisode = &episode
+
+		// Check if dub is available (anidb.se is sub-only)
+		dubAvail := false
+		if m.currentSource != nil {
+			if _, ok := m.currentSource.(*scraper.AnidbScraper); ok {
+				dubAvail = false
+			}
+		}
+		m.pendingDubAvail = dubAvail
+
+		m.screen = ScreenSelectDubSub
+		return m, nil
 	}
 
 	return m, nil

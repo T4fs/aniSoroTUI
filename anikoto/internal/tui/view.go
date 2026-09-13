@@ -33,6 +33,8 @@ func (m Model) View() string {
 		content = m.viewLoading(m.loadingText)
 	case ScreenWatching:
 		content = m.viewWatching()
+	case ScreenSelectDubSub:
+		content = m.viewSelectDubSub()
 	default:
 		content = m.viewHome()
 	}
@@ -598,6 +600,67 @@ func (m Model) viewWatching() string {
 	result.WriteString(separatorLine)
 	result.WriteString("\n")
 	result.WriteString(helpLine)
+	return result.String()
+}
+
+func (m Model) viewSelectDubSub() string {
+	var sb strings.Builder
+
+	// Title
+	title := ""
+	if m.selectedAnime != nil {
+		title = m.selectedAnime.Title
+	}
+	sb.WriteString(lipgloss.PlaceHorizontal(m.width, lipgloss.Center, TitleStyle.Render(title)))
+	sb.WriteString("\n\n")
+
+	if m.pendingEpisode != nil {
+		epNum := strings.TrimPrefix(m.pendingEpisode.Number, "EP ")
+		epNum = strings.TrimPrefix(epNum, "Episode ")
+		epLine := fmt.Sprintf("EP %s - %s", epNum, m.pendingEpisode.Title)
+		sb.WriteString(lipgloss.PlaceHorizontal(m.width, lipgloss.Center, epLine))
+		sb.WriteString("\n\n")
+	}
+
+	// Sub/Dub selection box
+	subStyle := SelectedListItemStyle.Width(40)
+	dubStyle := ListItemStyle.Width(40)
+
+	if !m.dub { // sub selected
+		subStyle = SelectedListItemStyle.Width(40)
+		dubStyle = ListItemStyle.Width(40)
+	} else { // dub selected
+		subStyle = ListItemStyle.Width(40)
+		dubStyle = SelectedListItemStyle.Width(40)
+	}
+
+	subLabel := "SUB"
+	dubLabel := "DUB"
+	if !m.pendingDubAvail {
+		dubLabel = "DUB (not available)"
+	}
+
+	subBtn := subStyle.Render("▸ " + subLabel)
+	dubBtn := dubStyle.Render("  " + dubLabel)
+
+	btnLine := lipgloss.JoinHorizontal(lipgloss.Center, subBtn, "  ", dubBtn)
+	sb.WriteString(lipgloss.PlaceHorizontal(m.width, lipgloss.Center, btnLine))
+	sb.WriteString("\n\n")
+
+	// Hint
+	hint := DimStyle.Render("←/→ or s/d to select  |  enter to play  |  esc to cancel")
+	sb.WriteString(lipgloss.PlaceHorizontal(m.width, lipgloss.Center, hint))
+
+	// Center vertically
+	contentStr := sb.String()
+	contentHeight := strings.Count(contentStr, "\n") + 1
+	topPad := (m.height - contentHeight) / 2
+	if topPad < 0 {
+		topPad = 0
+	}
+	var result strings.Builder
+	result.WriteString(strings.Repeat("\n", topPad))
+	result.WriteString(contentStr)
 	return result.String()
 }
 
