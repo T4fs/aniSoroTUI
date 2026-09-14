@@ -95,7 +95,7 @@
   .nav-in { max-width: 860px; margin: 0 auto; padding: 14px 24px;
     display: flex; align-items: center; gap: 20px; }
   .brand { font-weight: 800; color: var(--text); }
-  .brand b { color: var(--accent); }
+  
   .nav-links { margin-left: auto; display: flex; gap: 16px; }
   .nav-links a { color: var(--muted); font-size: .92rem; }
   .nav-links a:hover { color: var(--text); text-decoration: none; }
@@ -157,7 +157,7 @@
 
 <nav>
   <div class="nav-in">
-    <a class="brand" href="index.html">An<b>!</b>KOTO <span style="color:var(--muted);font-weight:400">wiki</span></a>
+    <a class="brand" href="index.html">aniSoroTUI <span style="color:var(--muted);font-weight:400">wiki</span></a>
     <div class="nav-links">
       <a href="index.html">Home</a>
       <a class="on" href="wiki.html">Wiki</a>
@@ -405,13 +405,13 @@
     <table>
       <tr><th>var</th><th>effect</th></tr>
       <tr><td><code>ANITUI_PLAYER</code></td><td>force a player (e.g. <code>mpv</code>, <code>vlc</code>, <code>iina</code>, <code>haruna</code>)</td></tr>
-      <tr><td><code>ANIKOTO_DEBUG</code></td><td>write <code>anikoto-tui-debug.log</code> to your temp folder (see bug fixes)</td></tr>
+      <tr><td><code>ANISORO_DEBUG</code></td><td>write <code>aniSoro-tui-debug.log</code> to your temp folder (see bug fixes)</td></tr>
     </table>
 
     <h3>Project layout</h3>
-    <pre>anikoto/
+    <pre>aniSoro/
 ├── cmd/anitui        # entrypoint (wires the anidb.se scraper, enables mouse)
-├── internal/scraper  # anidb.go source + tests; anikoto.go/allanime.go are dead code
+├── internal/scraper  # anidb.go source + tests; anikototv.go/allanime.go are dead code
 ├── internal/tui      # bubbletea UI: screens, home layout, credit button, mouse
 ├── internal/player   # mpv / vlc / iina / haruna detection
 └── internal/update   # self-update (disabled in this build)</pre>
@@ -470,8 +470,8 @@
   <div class="fix glass">
     <h3><span class="st help">TROUBLESHOOT</span> how to report a bug properly</h3>
     <ul>
-      <li>Run with debug logging: <code>ANIKOTO_DEBUG=1 aniSoro</code>.</li>
-      <li>Reproduce the problem, exit, then attach <code>%TEMP%\anikoto-tui-debug.log</code> (Windows) or <code>/tmp/anikoto-tui-debug.log</code> (Linux/macOS) to a <a href="https://github.com/T4fs/aniSoroTUI/issues">GitHub issue</a>.</li>
+      <li>Run with debug logging: <code>ANISORO_DEBUG=1 aniSoro</code>.</li>
+      <li>Reproduce the problem, exit, then attach <code>%TEMP%\aniSoro-tui-debug.log</code> (Windows) or <code>/tmp/aniSoro-tui-debug.log</code> (Linux/macOS) to a <a href="https://github.com/T4fs/aniSoroTUI/issues">GitHub issue</a>.</li>
       <li>Include your terminal (Windows Terminal / cmd / PowerShell / kitty / …) and player version.</li>
     </ul>
   </div>
@@ -496,14 +496,14 @@
     <p>Prefer to build yourself? Requires Go 1.25+.</p>
     <pre># Windows (PowerShell)
 git clone https://github.com/T4fs/aniSoroTUI
-cd aniSoroTUI/anikoto
+cd aniSoroTUI/aniSoro
 go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui
 New-Item -ItemType Directory -Force -Path "$HOME\scoop\shims" | Out-Null
 Set-Content "$HOME\scoop\shims\aniSoro.cmd" '@"%USERPROFILE%\.anitui\anitui.exe" %*'
 
 # Linux / macOS
 git clone https://github.com/T4fs/aniSoroTUI
-cd aniSoroTUI/anikoto
+cd aniSoroTUI/aniSoro
 make build
 ./build/anitui</pre>
 

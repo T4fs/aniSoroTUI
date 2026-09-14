@@ -79,14 +79,14 @@ command -v go >/dev/null 2>&1 || die "Go is still unavailable after setup."
 ANITUI_HOME="${ANITUI_HOME:-$HOME/.anitui}"
 mkdir -p "$ANITUI_HOME"
 say "Downloading the aniSoroTUI source..."
-fetch "https://codeload.github.com/T4fs/aniSoroTUI/tar.gz/refs/heads/main" "$ANITUI_HOME/anikoto.tgz"
+fetch "https://codeload.github.com/T4fs/aniSoroTUI/tar.gz/refs/heads/main" "$ANITUI_HOME/aniSoro.tgz"
 SRC_DIR="$ANITUI_HOME/src"
 rm -rf "$SRC_DIR"; mkdir -p "$SRC_DIR"
-tar -C "$SRC_DIR" -xzf "$ANITUI_HOME/anikoto.tgz"
-rm -f "$ANITUI_HOME/anikoto.tgz"
+tar -C "$SRC_DIR" -xzf "$ANITUI_HOME/aniSoro.tgz"
+rm -f "$ANITUI_HOME/aniSoro.tgz"
 PROJ=$(find "$SRC_DIR" -maxdepth 1 -type d -iname '*aniSoroTUI*' | head -n1)
 [ -n "$PROJ" ] || die "could not locate the source after extraction."
-cd "$PROJ/anikoto"
+cd "$PROJ/aniSoro"
 
 # ---------------------------------------------------------------------------
 # 4. build and install

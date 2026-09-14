@@ -71,7 +71,7 @@ Remove-Item -Force $srcZip -ErrorAction SilentlyContinue
 
 $proj = Get-ChildItem -Path $srcRoot -Directory | Where-Object { $_.Name -like '*aniSoroTUI*' } | Select-Object -First 1
 if (-not $proj) { Die "could not locate the source after extraction." }
-$module = Join-Path $proj.FullName 'anikoto'
+$module = Join-Path $proj.FullName 'aniSoro'
 
 # --- 3. build ---
 $binDir = Join-Path $AnituiHome 'bin'

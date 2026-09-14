@@ -21,12 +21,12 @@ full documentation, the update log, and bug fixes live in the [**aniSoroTUI wiki
 
 ## getting started
 
-the code lives in the [`anikoto/`](anikoto) directory.
+the code lives in the [`aniSoro/`](aniSoro) directory.
 
 ### from source (any platform)
 
 ```bash
-cd anikoto
+cd aniSoro
 make build
 ./build/anitui
 ```
@@ -34,14 +34,14 @@ make build
 or directly with Go:
 
 ```bash
-cd anikoto
+cd aniSoro
 go run ./cmd/anitui
 ```
 
 ### windows
 
 ```powershell
-cd anikoto
+cd aniSoro
 go build -trimpath -o "$HOME\.anitui\anitui.exe" ./cmd/anitui
 ```
 
@@ -116,7 +116,7 @@ override via the `ANITUI_PLAYER` environment variable.
 ## project layout
 
 ```
-anikoto/
+aniSoro/
 ├── cmd/anitui        # entrypoint
 ├── internal/scraper  # anidb.app source
 ├── internal/tui      # bubbletea ui, home screen, credit button
@@ -134,4 +134,4 @@ anikoto/
 
 ## license
 
-GPL-3.0 — see [`anikoto/LICENSE`](anikoto/LICENSE).
+GPL-3.0 — see [`aniSoro/LICENSE`](aniSoro/LICENSE).
