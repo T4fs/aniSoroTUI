@@ -106,25 +106,25 @@
   .lede { color: var(--muted); margin-bottom: 34px; }
   .lede b { color: var(--accent2); }
 
-  .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 40;
+.sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; z-index: 40;
     background: linear-gradient(155deg, rgba(255,255,255,.13), rgba(255,255,255,.045) 45%, rgba(255,255,255,.02));
     backdrop-filter: blur(22px) saturate(180%);
     -webkit-backdrop-filter: blur(22px) saturate(180%);
     border-right: 1px solid var(--glass-border);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.15), inset 0 -1px 0 rgba(0,0,0,.25), var(--shadow);
-    padding: 80px 0 40px; display: flex; flex-direction: column; }
-  .sidebar-header { padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,.12); }
+    padding: 60px 0 20px; display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar-header { padding: 0 20px 12px; border-bottom: 1px solid rgba(255,255,255,.12); flex-shrink: 0; }
   .sidebar-title { font-size: .7rem; text-transform: uppercase; letter-spacing: 1px;
-    color: var(--muted); font-weight: 700; margin-bottom: 16px; }
-  .sidebar-nav { list-style: none; padding: 0 12px; flex: 1; }
-  .sidebar-nav li { margin: 4px 0; }
-  .sidebar-nav a { display: block; padding: 10px 14px; border-radius: 10px;
-    color: var(--muted); font-size: .9rem; text-decoration: none; transition: all .15s; }
+    color: var(--muted); font-weight: 700; margin-bottom: 12px; }
+  .sidebar-nav { list-style: none; padding: 0 12px; flex: 1; overflow: hidden; }
+  .sidebar-nav li { margin: 2px 0; }
+  .sidebar-nav a { display: block; padding: 8px 12px; border-radius: 8px;
+    color: var(--muted); font-size: .85rem; text-decoration: none; transition: all .15s; }
   .sidebar-nav a:hover { color: var(--text); background: rgba(255,212,121,.15); }
   .sidebar-nav a i { color: var(--accent); margin-right: 10px; width: 18px; text-align: center; }
   .sidebar-nav a.active { color: var(--text); background: rgba(255,212,121,.2); }
-  .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.12);
-    font-size: .75rem; color: var(--muted); text-align: center; }
+  .sidebar-footer { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,.12);
+    font-size: .7rem; color: var(--muted); text-align: center; flex-shrink: 0; }
 
   main { max-width: 860px; margin: 0 auto 0 280px; padding: 40px 24px 80px; }
 
